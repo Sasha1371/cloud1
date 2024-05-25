@@ -4,6 +4,7 @@ pipeline {
     environment {
         // Додаємо креденшіали для Docker
         DOCKER_CREDENTIALS_ID = 'e93a1735-85d5-4d43-9daf-a8f799888866'
+        SQL_CONTAINER_NAME = 'lendy123/sql'
         FRONTEND_CONTAINER_NAME = 'lendy123/frontend'
         BACKEND_CONTAINER_NAME = 'lendy123/backend'
     }
@@ -32,7 +33,15 @@ pipeline {
             steps {
                 script {
                     // Додаємо тег 'latest' до збудованого образу
-                    sh 'docker tag lendy123/sql:latest'
+                    sh 'docker tag lendy123/sql:version${BUILD_NUMBER} lendy123/sql:latest'
+                }
+            }
+        }
+        stage('Пуш у MySQL в Docker Hub') {
+            steps {
+                script {
+                    // Пушимо зображення на Docker Hub
+                    sh 'docker push lendy123/sql:latest'
                 }
             }
         }
