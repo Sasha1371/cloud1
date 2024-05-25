@@ -33,9 +33,24 @@ pipeline {
             steps {
                 script {
                     // Додаємо тег 'latest' до збудованого образу
-                    sh 'docker tag lendy123/frontend:version${BUILD_NUMBER} lendy123/cloudproject:latest' 
+                    sh 'docker tag lendy123/frontend:version${BUILD_NUMBER} lendy123/cloudproject:latest' '
+                }
+            }
+        } 
+        stage('Пуш у frontend Docker Hub') {
+            steps {
+                script {
+                    // Пушимо зображення на Docker Hub
                     sh 'docker push lendy123/frontend:version${BUILD_NUMBER}'
-                    sh 'docker push lendy123/frontend:latest'
+                    sh 'docker push lendy123/frontend:latest
+                }
+            }
+        }
+        stage('Білд BackEnd зображення') {
+            steps {
+                script {
+                    // Будуємо Docker зображення
+                    sh 'cd BackEnd/Amazon-clone/ && ls'
                 }
             }
         }
