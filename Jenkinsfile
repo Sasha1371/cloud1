@@ -36,12 +36,14 @@ pipeline {
         }
 
         stage('Проверка Dockerfile') {
-            steps {
-                script {
-                    sh 'ls -la BackEnd/Amazon-clone/'
-                }
-            }
+    steps {
+        script {
+            sh 'ls -la BackEnd/Amazon-clone/'
+            sh 'cat BackEnd/Amazon-clone/Dockerfile'
         }
+    }
+}
+
 
 
         stage('Тегування BackEnd зображення ') {
