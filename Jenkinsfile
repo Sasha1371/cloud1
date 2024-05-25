@@ -54,6 +54,23 @@ pipeline {
                 }
             }
         }
+         stage('Тегування BackEnd зображення ') {
+            steps {
+                script {
+                    // Додаємо тег 'latest' до збудованого образу
+                    sh 'docker tag lendy123/backend:version${BUILD_NUMBER} lendy123/backend:latest'
+                }
+            }
+        }
+        stage('Пуш у Backend Docker Hub') {
+            steps {
+                script {
+                    // Пушимо зображення на Docker Hub
+                    sh 'docker push lendy123/backend:version${BUILD_NUMBER}'
+                    sh 'docker push lendy123/backend:latest'
+                }
+            }
+        }
         stage('Зупинка та видалення старого контейнера') {
             steps {
                 script {
