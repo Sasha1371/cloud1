@@ -38,7 +38,11 @@ pipeline {
         stage('Білд BackEnd зображення') {
             steps {
                 script {
-                    sh 'cd BackEnd/Amazon-clone/Dockerfile && docker build -t lendy123/backend:version${BUILD_NUMBER} .'
+                    // Переход в директорию с Dockerfile
+                    dir('BackEnd/Amazon-clone') {
+                    // Будуем Docker образ
+                    sh 'docker build -t lendy123/backend:version${BUILD_NUMBER} .'
+                    }
                 }
             }
         }
