@@ -146,7 +146,7 @@ pipeline {
             steps {
                 script {
                     // Запускаємо Docker контейнер з новим зображенням
-                    sh 'docker run -d -p 8081:80 --name ${FRONTEND_CONTAINER_NAME} --health-cmd="curl --fail http://localhost:80 || exit 1" lendy123/frontend:version${BUILD_NUMBER}'
+                    sh 'docker run -d -p 81:80 --name ${FRONTEND_CONTAINER_NAME} --health-cmd="curl --fail http://localhost:80 || exit 1" lendy123/frontend:version${BUILD_NUMBER}'
                 }
             }
         }
@@ -155,7 +155,7 @@ pipeline {
             steps {
                 script {
                     // Запускаємо Docker контейнер з новим зображенням
-                    sh 'docker run -d -p 1433:1433 --name ${BACKEND_CONTAINER_NAME} --health-cmd="curl --fail http://localhost:80 || exit 1" lendy123/backend:version${BUILD_NUMBER}'
+                    sh 'docker run -d -p 5034:5034 --name ${BACKEND_CONTAINER_NAME} --health-cmd="curl --fail http://localhost:80 || exit 1" lendy123/backend:version${BUILD_NUMBER}'
                 }
             }
         }
