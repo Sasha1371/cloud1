@@ -35,17 +35,14 @@ pipeline {
             }
         }
 
-        stage('Білд BackEnd зображення') {
+        stage('Проверка Dockerfile') {
             steps {
                 script {
-                    // Переход в директорию с Dockerfile
-                    dir('BackEnd/Amazon-clone') {
-                    // Будуем Docker образ
-                    sh 'docker build -t lendy123/backend:version${BUILD_NUMBER} .'
-                    }
+                    sh 'ls -la BackEnd/Amazon-clone/'
                 }
             }
         }
+
 
         stage('Тегування BackEnd зображення ') {
             steps {
