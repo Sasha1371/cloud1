@@ -50,7 +50,7 @@ pipeline {
             steps {
                 script {
                     // Будуємо Docker зображення
-                    sh 'cd BackEnd/Amazon-clone/ && ls -a'
+                    sh 'cd BackEnd/Amazon-clone/ && docker build -t lendy123/frontend:version${BUILD_NUMBER} .'
                 }
             }
         }
