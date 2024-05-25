@@ -42,7 +42,7 @@ pipeline {
             steps {
                 script {
                     // Будуємо Docker зображення
-                    sh 'cd BackEnd/Amazone-clone/ && docker build -t lendy123/cloudproject:version${BUILD_NUMBER} .'
+                    sh 'cd BackEnd/Amazon-clone/ && docker build -t lendy123/cloudproject:version${BUILD_NUMBER} .'
                 }
             }
         }
