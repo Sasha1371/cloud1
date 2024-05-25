@@ -3,29 +3,67 @@ pipeline {
 
     environment {
         // Додаємо креденшіали для Docker
-        DOCKER_CREDENTIALS_ID = 'dockerhub'
-        CONTAINER_NAME = 'lendy123_cloudproject'
+        DOCKER_CREDENTIALS_ID = '4d2ff1d5-c2d4-4e7b-929d-1e7504b286fb'
+        CONTAINER_NAME = 'lendy123/cloudproject'
     }
    
+
     stages {
-        stage("docker login") {
+        
+        
+       stage('Вхід у Docker') {
             steps {
-                echo " ============== docker login =================="
-                withCredentials([usernamePassword(credentialsId: '4d2ff1d5-c2d4-4e7b-929d-1e7504b286fb', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    script {
-                        def loginResult = sh(script: "docker login -u $USERNAME -p $PASSWORD", returnStatus: true)
-                        if (loginResult != 0) {
-                            error "Failed to log in to Docker Hub. Exit code: ${loginResult}"
-                        }
+                script {
+                    // Використовуємо креденшіали з Jenkins для входу в Docker
+                    withCredentials([usernamePassword(credentialsId: DOCKER_CREDENTIALS_ID, passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+                        sh 'echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin'
                     }
                 }
             }
         }
-        stage('Step1') {
+
+        stage('Білд FrontEnd зображення') {
             steps {
-                echo " ============== Build and push =================="
-                sh 'docker build -t lendy123/cloudproject:version${BUILD_NUMBER} .'
-                sh 'docker push lendy123/cloudproject:version${BUILD_NUMBER}'
+                script {
+                    // Будуємо Docker зображення
+                    sh 'cd FrontEnd/my-app/ && docker build -t lendy123/cloudproject:version${BUILD_NUMBER} .'
+                }
+            }
+        }
+
+          stage('Тегування Docker зображення') {
+            steps {
+                script {
+                    // Додаємо тег 'latest' до збудованого образу
+                    sh 'docker tag lendy123/cloudproject:version${BUILD_NUMBER} lendy123/cloudproject:latest'
+                }
+            }
+        }
+        stage('Білд BackEnd зображення') {
+            steps {
+                script {
+                    // Будуємо Docker зображення
+                    sh 'cd BackEnd/Amazone-clone/ && docker build -t lendy123/cloudproject:version${BUILD_NUMBER} .'
+                }
+            }
+        }
+
+          stage('Тегування Docker зображення') {
+            steps {
+                script {
+                    // Додаємо тег 'latest' до збудованого образу
+                    sh 'docker tag lendy123/cloudproject:version${BUILD_NUMBER} lendy123/cloudproject:latest'
+                }
+            }
+        }
+        
+        stage('Пуш у Docker Hub') {
+            steps {
+                script {
+                    // Пушимо зображення на Docker Hub
+                    sh 'docker push lendy123/cloudproject:version${BUILD_NUMBER}'
+                    sh 'docker push lendy123/cloudproject:latest'
+                }
             }
         }
         stage('Зупинка та видалення старого контейнера') {
@@ -33,7 +71,7 @@ pipeline {
                 script {
                     // Спроба зупинити та видалити старий контейнер, якщо він існує
                     sh """
-                    if [ \$(docker ps -aq -f name=${CONTAINER_NAME}) ]; then
+                    if [ \$(docker ps -aq -f name=^${CONTAINER_NAME}\$) ]; then
                         docker stop ${CONTAINER_NAME}
                         docker rm ${CONTAINER_NAME}
                     else
@@ -43,19 +81,24 @@ pipeline {
                 }
             }
         }
-        stage('Чистка старих образів') {
+
+             stage('Чистка старих образів') {
             steps {
                 script {
-                    // Чистка старых образов
-                    sh 'docker image prune -a --filter "until=5m" --force'
+                    // Пушимо зображення на Docker Hub
+                    sh 'docker image prune -a --filter "until=24h" --force'
+
                 }
             }
         }
+        
+        
         stage('Запуск Docker контейнера') {
             steps {
                 script {
-                    // Запуск Docker контейнера с новым изображением
-                    sh 'docker run -d -p 8551:80 --name ${CONTAINER_NAME} --health-cmd="curl --fail http://localhost:80 || exit 1" lendy123/cloudproject:version${BUILD_NUMBER}'
+                    // Запускаємо Docker контейнер з новим зображенням
+                    sh 'docker run -d -p 8081:80 --name ${CONTAINER_NAME} --health-cmd="curl --fail http://localhost:80 || exit 1" lendy123/cloudproject:version${BUILD_NUMBER}'
+
                 }
             }
         }
