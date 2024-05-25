@@ -24,7 +24,7 @@ pipeline {
             steps {
                 script {
                     // Будуємо Docker зображення
-                    sh 'cd FrontEnd/my-app/ && docker build -t lendy123/backend:version${BUILD_NUMBER} .'
+                    sh 'cd BackEnd/Amazon-clone && docker build -t lendy123/backend:version${BUILD_NUMBER} .'
                 }
             }
         }
