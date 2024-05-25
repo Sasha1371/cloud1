@@ -26,7 +26,7 @@ pipeline {
             steps {
                 script {
                     // Будуємо Docker зображення
-                    sh 'cd FrontEnd/my-app/ && docker build -t lendy123/cloudproject:version${BUILD_NUMBER} .'
+                    sh 'cd cloud/FrontEnd/my-app/ && docker build -t lendy123/cloudproject:version${BUILD_NUMBER} .'
                 }
             }
         }
@@ -42,7 +42,7 @@ pipeline {
             steps {
                 script {
                     // Будуємо Docker зображення
-                    sh 'cd BackEnd/Amazon-clone/ && docker build -t lendy123/cloudproject:version${BUILD_NUMBER} .'
+                    sh 'cd cloud/BackEnd/Amazon-clone/ && docker build -t lendy123/cloudproject:version${BUILD_NUMBER} .'
                 }
             }
         }
