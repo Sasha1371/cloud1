@@ -38,7 +38,7 @@ pipeline {
         stage('Проверка Dockerfile') {
             steps {
                 script {
-                    sh 'cd BackEnd/Amazon-clone/ && docker build -t lendy123/backend:version${BUILD_NUMBER} .'
+                    sh 'cd home/sasha/cloud/BackEnd/Amazon-clone/ && docker build -t lendy123/backend:version${BUILD_NUMBER} .'
                 }
             }
         }
