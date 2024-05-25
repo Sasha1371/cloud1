@@ -2,9 +2,11 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_CREDENTIALS_ID = 'e93a1735-85d5-4d43-9daf-a8f799888866'
-        CONTAINER_NAME = 'lendy123/frontend' // Может быть 'lendy123/backend' в зависимости от контекста
+        // Додаємо креденшіали для Docker
+        DOCKER_CREDENTIALS_ID = '4d2ff1d5-c2d4-4e7b-929d-1e7504b286fb'
+        CONTAINER_NAME = 'lendy123'
     }
+   
 
     stages {
         
@@ -20,22 +22,94 @@ pipeline {
             }
         }
 
-        stage('Білд Docker зображення') {
+        stage('Білд FrontEnd зображення') {
             steps {
                 script {
                     // Будуємо Docker зображення
-                    sh 'cd BackEnd/Amazon-clone && docker build -t lendy123/backend:version${BUILD_NUMBER} .'
+                    sh 'cd FrontEnd/my-app/ && docker build -t lendy123/frontend:version${BUILD_NUMBER} .'
+                }
+            }
+        }
+        stage('Тегування FrontEnd зображення') {
+            steps {
+                script {
+                    // Додаємо тег 'latest' до збудованого образу
+                    sh 'docker tag lendy123/frontend:version${BUILD_NUMBER} lendy123/frontend:latest'
+                }
+            }
+        }
+        stage('Пуш у frontend Docker Hub') {
+            steps {
+                script {
+                    // Пушимо зображення на Docker Hub
+                    sh 'docker push lendy123/frontend:version${BUILD_NUMBER}'
+                    sh 'docker push lendy123/frontend:latest'
+                }
+            }
+        }
+        stage('Білд BackEnd зображення') {
+            steps {
+                script {
+                    // Будуємо Docker зображення
+                    sh 'cd BackEnd/Amazon-clone/ && docker build -t lendy123/backend:version${BUILD_NUMBER} .'
                 }
             }
         }
 
-          stage('Тегування Docker зображення') {
+        stage('Тегування BackEnd зображення') {
             steps {
                 script {
                     // Додаємо тег 'latest' до збудованого образу
                     sh 'docker tag lendy123/backend:version${BUILD_NUMBER} lendy123/backend:latest'
                 }
             }
-        }  
+        }
+        
+        stage('Пуш у backend Docker Hub') {
+            steps {
+                script {
+                    // Пушимо зображення на Docker Hub
+                    sh 'docker push lendy123/backend:version${BUILD_NUMBER}'
+                    sh 'docker push lendy123/backend:latest'
+                }
+            }
+        }
+        stage('Зупинка та видалення старого контейнера') {
+            steps {
+                script {
+                    // Спроба зупинити та видалити старий контейнер, якщо він існує
+                    sh """
+                    if [ \$(docker ps -aq -f name=^${CONTAINER_NAME}\$) ]; then
+                        docker stop ${CONTAINER_NAME}
+                        docker rm ${CONTAINER_NAME}
+                    else
+                        echo "Контейнер ${CONTAINER_NAME} не знайдено. Продовжуємо..."
+                    fi
+                    """
+                }
+            }
+        }
+
+        stage('Чистка старих образів') {
+            steps {
+                script {
+                    // Пушимо зображення на Docker Hub
+                    sh 'docker image prune -a --filter "until=24h" --force'
+
+                }
+            }
+        }
+        
+        
+        stage('Запуск Docker контейнера') {
+            steps {
+                script {
+                    // Запускаємо Docker контейнер з новим зображенням
+                    sh 'docker run -d -p 8081:80 --name ${CONTAINER_NAME} --health-cmd="curl --fail http://localhost:80 || exit 1" lendy123/frontend:version${BUILD_NUMBER}'
+                    sh 'docker run -d -p 1433:1433 --name ${CONTAINER_NAME} --health-cmd="curl --fail http://localhost:80 || exit 1" lendy123/backend:version${BUILD_NUMBER}'
+
+                }
+            }
+        }
     }
 }
