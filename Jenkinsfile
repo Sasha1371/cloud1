@@ -30,8 +30,7 @@ pipeline {
                 }
             }
         }
-
-        stage('Тегування Docker зображення') {
+        stage('Тегування FrontEnd зображення') {
             steps {
                 script {
                     // Додаємо тег 'latest' до збудованого образу
@@ -48,7 +47,7 @@ pipeline {
             }
         }
 
-        stage('Тегування Docker зображення') {
+        stage('Тегування BackEnd зображення') {
             steps {
                 script {
                     // Додаємо тег 'latest' до збудованого образу
