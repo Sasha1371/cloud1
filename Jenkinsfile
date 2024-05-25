@@ -33,7 +33,7 @@ pipeline {
             steps {
                 script {
                     // Додаємо тег 'latest' до збудованого образу
-                    sh 'docker tag lendy123/sql:version${BUILD_NUMBER} lendy123/sql:latest'
+                    sh 'docker tag lendy123/sql:latest lendy123/sql:version${BUILD_NUMBER}'
                 }
             }
         }
