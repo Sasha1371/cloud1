@@ -31,7 +31,7 @@ pipeline {
             }
         }
 
-          stage('Тегування Docker зображення') {
+        stage('Тегування Docker зображення') {
             steps {
                 script {
                     // Додаємо тег 'latest' до збудованого образу
@@ -48,7 +48,7 @@ pipeline {
             }
         }
 
-          stage('Тегування Docker зображення') {
+        stage('Тегування Docker зображення') {
             steps {
                 script {
                     // Додаємо тег 'latest' до збудованого образу
@@ -82,7 +82,7 @@ pipeline {
             }
         }
 
-             stage('Чистка старих образів') {
+        stage('Чистка старих образів') {
             steps {
                 script {
                     // Пушимо зображення на Docker Hub
