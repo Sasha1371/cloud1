@@ -4,14 +4,12 @@ pipeline {
     environment {
         // Додаємо креденшіали для Docker
         DOCKER_CREDENTIALS_ID = '4d2ff1d5-c2d4-4e7b-929d-1e7504b286fb'
-        CONTAINER_NAME = 'lendy123/frontend' && 'lendy123/backend'
+        FRONTEND_CONTAINER_NAME = 'lendy123/frontend'
+        BACKEND_CONTAINER_NAME = 'lendy123/backend'
     }
-   
 
     stages {
-        
-        
-       stage('Вхід у Docker') {
+        stage('Вхід у Docker') {
             steps {
                 script {
                     // Використовуємо креденшіали з Jenkins для входу в Docker
@@ -30,6 +28,7 @@ pipeline {
                 }
             }
         }
+
         stage('Тегування FrontEnd зображення') {
             steps {
                 script {
@@ -38,6 +37,7 @@ pipeline {
                 }
             }
         }
+
         stage('Пуш у frontend Docker Hub') {
             steps {
                 script {
@@ -47,6 +47,7 @@ pipeline {
                 }
             }
         }
+
         stage('Білд BackEnd зображення') {
             steps {
                 script {
@@ -64,7 +65,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Пуш у backend Docker Hub') {
             steps {
                 script {
@@ -74,16 +75,33 @@ pipeline {
                 }
             }
         }
-        stage('Зупинка та видалення старого контейнера') {
+
+        stage('Зупинка та видалення старого контейнера FrontEnd') {
             steps {
                 script {
                     // Спроба зупинити та видалити старий контейнер, якщо він існує
                     sh """
-                    if [ \$(docker ps -aq -f name=^${CONTAINER_NAME}\$) ]; then
-                        docker stop ${CONTAINER_NAME}
-                        docker rm ${CONTAINER_NAME}
+                    if [ \$(docker ps -aq -f name=^${FRONTEND_CONTAINER_NAME}\$) ]; then
+                        docker stop ${FRONTEND_CONTAINER_NAME}
+                        docker rm ${FRONTEND_CONTAINER_NAME}
                     else
-                        echo "Контейнер ${CONTAINER_NAME} не знайдено. Продовжуємо..."
+                        echo "Контейнер ${FRONTEND_CONTAINER_NAME} не знайдено. Продовжуємо..."
+                    fi
+                    """
+                }
+            }
+        }
+
+        stage('Зупинка та видалення старого контейнера BackEnd') {
+            steps {
+                script {
+                    // Спроба зупинити та видалити старий контейнер, якщо він існує
+                    sh """
+                    if [ \$(docker ps -aq -f name=^${BACKEND_CONTAINER_NAME}\$) ]; then
+                        docker stop ${BACKEND_CONTAINER_NAME}
+                        docker rm ${BACKEND_CONTAINER_NAME}
+                    else
+                        echo "Контейнер ${BACKEND_CONTAINER_NAME} не знайдено. Продовжуємо..."
                     fi
                     """
                 }
@@ -93,21 +111,26 @@ pipeline {
         stage('Чистка старих образів') {
             steps {
                 script {
-                    // Пушимо зображення на Docker Hub
+                    // Чистимо старі образи
                     sh 'docker image prune -a --filter "until=24h" --force'
-
                 }
             }
         }
-        
-        
-        stage('Запуск Docker контейнера') {
+
+        stage('Запуск Docker контейнера FrontEnd') {
             steps {
                 script {
                     // Запускаємо Docker контейнер з новим зображенням
-                    sh 'docker run -d -p 8081:80 --name ${CONTAINER_NAME} --health-cmd="curl --fail http://localhost:80 || exit 1" lendy123/frontend:version${BUILD_NUMBER}'
-                    sh 'docker run -d -p 1433:1433 --name ${CONTAINER_NAME} --health-cmd="curl --fail http://localhost:80 || exit 1" lendy123/backend:version${BUILD_NUMBER}'
+                    sh 'docker run -d -p 8081:80 --name ${FRONTEND_CONTAINER_NAME} --health-cmd="curl --fail http://localhost:80 || exit 1" lendy123/frontend:version${BUILD_NUMBER}'
+                }
+            }
+        }
 
+        stage('Запуск Docker контейнера BackEnd') {
+            steps {
+                script {
+                    // Запускаємо Docker контейнер з новим зображенням
+                    sh 'docker run -d -p 1433:1433 --name ${BACKEND_CONTAINER_NAME} --health-cmd="curl --fail http://localhost:80 || exit 1" lendy123/backend:version${BUILD_NUMBER}'
                 }
             }
         }
