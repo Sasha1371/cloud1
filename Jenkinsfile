@@ -21,22 +21,6 @@ pipeline {
                 }
             }
         }
-        stage('Білд sql зображення') {
-            steps {
-                script {
-                    // Будуємо Docker зображення
-                    sh 'docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=Qwerty-1" -p 1433:1433 --name sql111 --hostname sql1 -d mcr.microsoft.com/mssql/server:2022-latest'
-                }
-            }
-        }
-        stage('Тегування sql зображення') {
-            steps {
-                script {
-                    // Додаємо тег 'latest' до збудованого образу
-                    sh 'docker tag lendy123/cloudproject:version${BUILD_NUMBER} lendy123/cloudproject:latest'
-                }
-            }
-        }
         stage('Білд FrontEnd зображення') {
             steps {
                 script {
@@ -110,6 +94,8 @@ pipeline {
                 script {
                     // Запускаємо Docker контейнер з новим зображенням
                     sh 'docker run -d -p 8081:80 --name ${CONTAINER_NAME} --health-cmd="curl --fail http://localhost:80 || exit 1" lendy123/cloudproject:version${BUILD_NUMBER}'
+                    sh 'docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=Qwerty-1" -p 1433:1433 --name sql111 --hostname sql1 -d mcr.microsoft.com/mssql/server:2022-latest'
+                    
 
                 }
             }
