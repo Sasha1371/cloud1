@@ -42,7 +42,7 @@ pipeline {
                 script {
                     // Пушимо зображення на Docker Hub
                     sh 'docker push lendy123/frontend:version${BUILD_NUMBER}'
-                    sh 'docker push lendy123/frontend:latest
+                    sh 'docker push lendy123/frontend:latest'
                 }
             }
         }
