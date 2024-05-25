@@ -50,7 +50,7 @@ pipeline {
             steps {
                 script {
                     // Будуємо Docker зображення
-                    sh 'cd BackEnd/Amazon-clone/ && ls'
+                    sh 'cd BackEnd/Amazon-clone/ && ls -a'
                 }
             }
         }
