@@ -33,7 +33,7 @@ pipeline {
             steps {
                 script {
                     // Додаємо тег 'latest' до збудованого образу
-                    sh 'docker tag mcr.microsoft.com/mssql/server:2022-latest lendy123/sql:latest lendy123/sql:version${BUILD_NUMBER}'
+                    sh 'docker tag mcr.microsoft.com/mssql/server:2022-latest lendy123/sql:latest'
                 }
             }
         }
