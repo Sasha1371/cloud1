@@ -146,7 +146,7 @@ pipeline {
             steps {
                 script {
                     // Запускаємо Docker контейнер з новим зображенням
-                    sh 'docker run -d -p 81:80 docker run -d -p 81:80 lendy123/frontend'
+                    sh 'docker run -d -p 81:80 lendy123/frontend'
                 }
             }
         }
