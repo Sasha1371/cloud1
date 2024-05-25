@@ -34,8 +34,8 @@ pipeline {
                 script {
                     // Додаємо тег 'latest' до збудованого образу
                     sh 'docker tag lendy123/frontend:version${BUILD_NUMBER} lendy123/cloudproject:latest' 
-                    sh 'docker push lendy123/cloudproject:version${BUILD_NUMBER}'
-                    sh 'docker push lendy123/cloudproject:latest'
+                    sh 'docker push lendy123/frontend:version${BUILD_NUMBER}'
+                    sh 'docker push lendy123/frontend:latest'
                 }
             }
         }
@@ -52,8 +52,8 @@ pipeline {
                 script {
                     // Додаємо тег 'latest' до збудованого образу
                     sh 'docker tag lendy123/backend:version${BUILD_NUMBER} lendy123/cloudproject:latest'
-                    sh 'docker push lendy123/cloudproject:version${BUILD_NUMBER}'
-                    sh 'docker push lendy123/cloudproject:latest'
+                    sh 'docker push lendy123/backend:version${BUILD_NUMBER}'
+                    sh 'docker push lendy123/backend:latest'
                 }
             }
         }
