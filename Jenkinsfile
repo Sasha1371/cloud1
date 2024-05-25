@@ -25,15 +25,17 @@ pipeline {
             steps {
                 script {
                     // Будуємо Docker зображення
-                    sh 'cd FrontEnd/my-app/ && docker build -t lendy123/cloudproject:version${BUILD_NUMBER} .'
+                    sh 'cd FrontEnd/my-app/ && docker build -t lendy123/frontend:version${BUILD_NUMBER} .'
                 }
             }
         }
-        stage('Тегування FrontEnd зображення') {
+        stage('Тегування FrontEnd зображення & push ') {
             steps {
                 script {
                     // Додаємо тег 'latest' до збудованого образу
-                    sh 'docker tag lendy123/cloudproject:version${BUILD_NUMBER} lendy123/cloudproject:latest'
+                    sh 'docker tag lendy123/frontend:version${BUILD_NUMBER} lendy123/cloudproject:latest' 
+                    sh 'docker push lendy123/cloudproject:version${BUILD_NUMBER}'
+                    sh 'docker push lendy123/cloudproject:latest'
                 }
             }
         }
@@ -41,23 +43,15 @@ pipeline {
             steps {
                 script {
                     // Будуємо Docker зображення
-                    sh 'ls'
-                    //sh 'cd BackEnd/Amazon-clone/ && docker build -t lendy123/cloudproject:version${BUILD_NUMBER} .'
+                    sh 'cd BackEnd/Amazon-clone/ && docker build -t lendy123/backend:version${BUILD_NUMBER} .'
                 }
             }
         }
-        stage('Тегування BackEnd зображення') {
+        stage('Тегування BackEnd зображення & push') {
             steps {
                 script {
                     // Додаємо тег 'latest' до збудованого образу
-                    sh 'docker tag lendy123/cloudproject:version${BUILD_NUMBER} lendy123/cloudproject:latest'
-                }
-            }
-        }
-        stage('Пуш у Docker Hub') {
-            steps {
-                script {
-                    // Пушимо зображення на Docker Hub
+                    sh 'docker tag lendy123/backend:version${BUILD_NUMBER} lendy123/cloudproject:latest'
                     sh 'docker push lendy123/cloudproject:version${BUILD_NUMBER}'
                     sh 'docker push lendy123/cloudproject:latest'
                 }
