@@ -33,7 +33,7 @@ pipeline {
             steps {
                 script {
                     // Додаємо тег 'latest' до збудованого образу
-                    sh 'docker tag lendy123/frontend:version${BUILD_NUMBER} lendy123/cloudproject:latest' '
+                    sh 'docker tag lendy123/frontend:version${BUILD_NUMBER} lendy123/frontend:latest' '
                 }
             }
         } 
