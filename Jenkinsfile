@@ -6,9 +6,12 @@ pipeline {
         DOCKER_CREDENTIALS_ID = '4d2ff1d5-c2d4-4e7b-929d-1e7504b286fb'
         CONTAINER_NAME = 'lendy123/cloudproject'
     }
+   
 
     stages {
-        stage('Вхід у Docker') {
+        
+        
+       stage('Вхід у Docker') {
             steps {
                 script {
                     // Використовуємо креденшіали з Jenkins для входу в Docker
@@ -18,49 +21,14 @@ pipeline {
                 }
             }
         }
-
-        stage('Білд FrontEnd зображення') {
-            steps {
-                script {
-                    // Будуємо Docker зображення
-                    sh 'cd FrontEnd/my-app/ && docker build -t lendy123/cloudproject:version${BUILD_NUMBER} .'
-                }
-            }
-        }
-
-        stage('Тегування FrontEnd зображення') {
-            steps {
-                script {
-                    // Додаємо тег 'latest' до збудованого образу
-                    sh 'docker tag lendy123/cloudproject:version${BUILD_NUMBER} lendy123/cloudproject:latest'
-                }
-            }
-        }
-
         stage('Білд BackEnd зображення') {
             steps {
                 script {
-                    // Лог текущего каталога
-                    sh 'echo "Current directory before cd: $(pwd)"'
-
-                    // Проверка наличия каталога и файлов
-                    sh 'ls -la BackEnd/Amazon-clone/'
-
-                    // Проверка, является ли Dockerfile символьной ссылкой
-                    sh 'if [ -L BackEnd/Amazon-clone/Dockerfile ]; then echo "Dockerfile is a symlink"; else echo "Dockerfile is not a symlink"; fi'
-
-                    // Проверка прав доступа на Dockerfile
-                    sh 'ls -l BackEnd/Amazon-clone/Dockerfile'
-
-                    // Лог текущего каталога после cd
-                    sh 'cd BackEnd/Amazon-clone/ && echo "Current directory after cd: $(pwd)"'
-
-                    // Переход в каталог BackEnd и сборка Docker образа
+                    // Будуємо Docker зображення
                     sh 'cd BackEnd/Amazon-clone/ && docker build -t lendy123/cloudproject:version${BUILD_NUMBER} .'
                 }
             }
         }
-
         stage('Тегування BackEnd зображення') {
             steps {
                 script {
@@ -69,7 +37,22 @@ pipeline {
                 }
             }
         }
-
+        stage('Білд FrontEnd зображення') {
+            steps {
+                script {
+                    // Будуємо Docker зображення
+                    sh 'cd FrontEnd/my-app/ && docker build -t lendy123/cloudproject:version${BUILD_NUMBER} .'
+                }
+            }
+        }
+        stage('Тегування FrontEnd зображення') {
+            steps {
+                script {
+                    // Додаємо тег 'latest' до збудованого образу
+                    sh 'docker tag lendy123/cloudproject:version${BUILD_NUMBER} lendy123/cloudproject:latest'
+                }
+            }
+        }
         stage('Пуш у Docker Hub') {
             steps {
                 script {
@@ -79,7 +62,6 @@ pipeline {
                 }
             }
         }
-
         stage('Зупинка та видалення старого контейнера') {
             steps {
                 script {
@@ -101,15 +83,18 @@ pipeline {
                 script {
                     // Пушимо зображення на Docker Hub
                     sh 'docker image prune -a --filter "until=24h" --force'
+
                 }
             }
         }
-
+        
+        
         stage('Запуск Docker контейнера') {
             steps {
                 script {
                     // Запускаємо Docker контейнер з новим зображенням
                     sh 'docker run -d -p 8081:80 --name ${CONTAINER_NAME} --health-cmd="curl --fail http://localhost:80 || exit 1" lendy123/cloudproject:version${BUILD_NUMBER}'
+
                 }
             }
         }
