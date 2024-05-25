@@ -38,7 +38,7 @@ pipeline {
             }
         }
 
-        stage('Пуш у frontend Docker Hub') {
+        stage('Пуш у FrontEnd в Docker Hub') {
             steps {
                 script {
                     // Пушимо зображення на Docker Hub
@@ -66,7 +66,7 @@ pipeline {
             }
         }
 
-        stage('Пуш у backend Docker Hub') {
+        stage('Пуш у BackEnd в Docker Hub') {
             steps {
                 script {
                     // Пушимо зображення на Docker Hub
