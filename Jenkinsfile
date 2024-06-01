@@ -10,7 +10,7 @@ pipeline {
     }
 
     stages {
-        stage('Вхід у Docker') {
+        stage('Вхід у DockerHub') {
             steps {
                 script {
                     // Використовуємо креденшіали з Jenkins для входу в Docker
@@ -37,7 +37,7 @@ pipeline {
                 }
             }
         }
-        stage('Пуш у MySQL в Docker Hub') {
+        stage('Пуш MySQL в DockerHub') {
             steps {
                 script {
                     // Пушимо зображення на Docker Hub
@@ -63,7 +63,7 @@ pipeline {
             }
         }
 
-        stage('Пуш у FrontEnd в Docker Hub') {
+        stage('Пуш FrontEnd в Docker Hub') {
             steps {
                 script {
                     // Пушимо зображення на Docker Hub
@@ -91,7 +91,7 @@ pipeline {
             }
         }
 
-        stage('Пуш у BackEnd в Docker Hub') {
+        stage('Пуш BackEnd в Docke Hub') {
             steps {
                 script {
                     // Пушимо зображення на Docker Hub
@@ -132,7 +132,21 @@ pipeline {
                 }
             }
         }
-
+        stage('Зупинка та видалення старого контейнера MySQL') {
+            steps {
+                script {
+                    // Спроба зупинити та видалити старий контейнер, якщо він існує
+                    sh """
+                    if [ \$(docker ps -aq -f name=^${SQL_CONTAINER_NAME}\$) ]; then
+                        docker stop ${SQL_CONTAINER_NAME}
+                        docker rm ${SQL_CONTAINER_NAME}
+                    else
+                        echo "Контейнер ${SQL_CONTAINER_NAME} не знайдено. Продовжуємо..."
+                    fi
+                    """
+                }
+            }
+        }    
         stage('Чистка старих образів') {
             steps {
                 script {
