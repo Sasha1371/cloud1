@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         // Додаємо креденшіали для Docker
-        DOCKER_CREDENTIALS_ID = 'dckr_pat_9zJfCVLX6iEiA8TGDA_y5V-IDcE'
+        DOCKER_CREDENTIALS_ID = 'dckr_pat_lg_bpqe5IjrXj9ttmz10ZTc3CvU'
         SQL_CONTAINER_NAME = 'lendy123/sql'
         FRONTEND_CONTAINER_NAME = 'lendy123/frontend'
         BACKEND_CONTAINER_NAME = 'lendy123/backend'
