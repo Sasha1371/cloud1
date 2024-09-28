@@ -28,7 +28,16 @@ kw10izU57mb9
     }
 
     stages {
-        stage('Install Docker') {
+        
+        stage('Підключення до Kubernetes') {
+            agent { label 'k8s-node-1' }  // Додай node для виконання
+            steps {
+                kubeconfig(credentialsId: KUBE_CREDENTIALS_ID, serverUrl: KUBE_SERVER_URL, caCertificate: KUBE_CA_CERTIFICATE) {
+                    echo 'Kubernetes connection established'
+                }
+            }
+        }
+                stage('Install Docker') {
             steps {
                 script {
                     sh '''
@@ -61,15 +70,6 @@ kw10izU57mb9
                 }
             }
         }
-        stage('Підключення до Kubernetes') {
-            agent { label 'k8s-node-1' }  // Додай node для виконання
-            steps {
-                kubeconfig(credentialsId: KUBE_CREDENTIALS_ID, serverUrl: KUBE_SERVER_URL, caCertificate: KUBE_CA_CERTIFICATE) {
-                    echo 'Kubernetes connection established'
-                }
-            }
-        }
-
         stage('Запуск MySQL на Node 1') {
             agent { label 'k8s-node-1' }
             steps {
