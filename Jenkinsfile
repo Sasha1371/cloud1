@@ -1,10 +1,13 @@
 pipeline {
+    agent none  // Загальний агент для всього pipeline
+
     stages {
         stage('Запуск MySQL на Node 1') {
             agent { label 'k8s-node-1' }
             steps {
                 script {
                     docker.image('mcr.microsoft.com/mssql/server:2022-latest').withRun("-e ACCEPT_EULA=Y -e MSSQL_SA_PASSWORD=Qwerty-1 -p 1433:1433 --name sql111 --hostname sql1") {
+                        // Додаткові налаштування
                     }
                 }
             }
