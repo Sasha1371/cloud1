@@ -3,6 +3,27 @@ pipeline {
         kubernetes {
             label 'jenkins-agent-cluster'
             defaultContainer 'jnlp'
+            yaml """
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    jenkins: agent
+spec:
+  containers:
+    - name: docker
+      image: docker:20.10.8
+      command:
+        - cat
+      tty: true
+      volumeMounts:
+        - name: docker-sock
+          mountPath: /var/run/docker.sock
+  volumes:
+    - name: docker-sock
+      hostPath:
+        path: /var/run/docker.sock
+"""
         }
     }
 
@@ -14,10 +35,11 @@ pipeline {
     stages {
         stage('Запуск MySQL на кластері') {
             steps {
-                script {
-                    def mysqlImage = docker.image('mcr.microsoft.com/mssql/server:2022-latest')
-                    mysqlImage.run('-e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=Qwerty-1" -p 1433:1433 --name sql111 --hostname sql1 -d')
-                    echo 'MySQL container started'
+                container('docker') {  // Використовуємо контейнер з Docker
+                    script {
+                        sh 'docker run -d -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=Qwerty-1" -p 1433:1433 --name sql111 --hostname sql1 mcr.microsoft.com/mssql/server:2022-latest'
+                        echo 'MySQL container started'
+                    }
                 }
             }
         }
@@ -25,9 +47,11 @@ pipeline {
         stage('Build FrontEnd') {
             steps {
                 dir('FrontEnd/my-app') {
-                    script {
-                        def frontendImage = docker.build("frontend/my-app", "-t frontend:latest .")
-                        frontendImage.run('-d -p 81:80')
+                    container('docker') {  // Використовуємо контейнер з Docker
+                        script {
+                            sh 'docker build -t frontend:latest .'
+                            sh 'docker run -d -p 81:80 frontend:latest'
+                        }
                     }
                 }
             }
@@ -36,9 +60,11 @@ pipeline {
         stage('Build BackEnd') {
             steps {
                 dir('BackEnd/Amazon-clone') {
-                    script {
-                        def backendImage = docker.build("backend/my-app", "-t backend:latest .")
-                        backendImage.run('-d -p 5034:5034')
+                    container('docker') {  // Використовуємо контейнер з Docker
+                        script {
+                            sh 'docker build -t backend:latest .'
+                            sh 'docker run -d -p 5034:5034 backend:latest'
+                        }
                     }
                 }
             }
