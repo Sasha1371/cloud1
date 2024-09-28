@@ -3,30 +3,7 @@ pipeline {
         kubernetes {
             label 'jenkins-agent-cluster'
             defaultContainer 'jnlp'
-            yaml """
-apiVersion: v1
-kind: Pod
-metadata:
-  labels:
-    jenkins: agent
-spec:
-  containers:
-    - name: docker
-      image: docker:20.10.8
-      command:
-        - cat
-      tty: true
-      volumeMounts:
-        - name: docker-sock
-          mountPath: /var/run/docker.sock
-  volumes:
-    - name: docker-sock
-      hostPath:
-        path: /var/run/docker.sock
-"""
         }
-    }
-
     environment {
         KUBE_CREDENTIALS_ID = '1625499a-1f81-4740-a265-6d1d81993962'
         KUBE_SERVER_URL = 'https://420447844CB1572AF2E75754D904D9A1.gr7.eu-central-1.eks.amazonaws.com'
