@@ -28,6 +28,39 @@ kw10izU57mb9
     }
 
     stages {
+        stage('Install Docker') {
+            steps {
+                script {
+                    sh '''
+                    # Check if Docker is installed
+                    if ! [ -x "$(command -v docker)" ]; then
+                      # Update the package database
+                      sudo apt-get update
+
+                      # Install Docker's dependencies
+                      sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+
+                      # Add Docker’s official GPG key
+                      curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+                      # Add Docker APT repository
+                      sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+
+                      # Update the package database with Docker packages from the newly added repository
+                      sudo apt-get update
+
+                      # Install Docker
+                      sudo apt-get install -y docker-ce
+
+                      # Verify that Docker is installed
+                      docker --version
+                    else
+                      echo "Docker is already installed"
+                    fi
+                    '''
+                }
+            }
+        }
         stage('Підключення до Kubernetes') {
             agent { label 'k8s-node-1' }  // Додай node для виконання
             steps {
