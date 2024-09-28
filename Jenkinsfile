@@ -3,6 +3,9 @@ pipeline {
         kubernetes {
             label 'jenkins-agent-cluster'
             defaultContainer 'jnlp'
+        }
+    }
+
     environment {
         KUBE_CREDENTIALS_ID = '1625499a-1f81-4740-a265-6d1d81993962'
         KUBE_SERVER_URL = 'https://420447844CB1572AF2E75754D904D9A1.gr7.eu-central-1.eks.amazonaws.com'
