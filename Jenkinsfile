@@ -4,36 +4,24 @@ pipeline {
             label 'jenkins-agent-cluster'
             defaultContainer 'jnlp'
             yaml """
-            apiVersion: apps/v1
-kind: DaemonSet
-metadata:
-  name: docker-daemonset
-  labels:
-    app: docker
-spec:
-  selector:
-    matchLabels:
-      app: docker
-  template:
-    metadata:
-      labels:
-        app: docker
-    spec:
-      containers:
-      - name: docker
-        image: docker:19.03.12
-        securityContext:
-          privileged: true
-        command: ["/bin/sh"]
-        args: ["-c", "while true; do sleep 3600; done"]
-        volumeMounts:
-        - name: docker-socket
-          mountPath: /var/run/docker.sock
-      volumes:
-      - name: docker-socket
-        hostPath:
-          path: /var/run/docker.sock
-
+            apiVersion: v1
+            kind: Pod
+            spec:
+              containers:
+              - name: docker
+                image: docker:19.03.12
+                command:
+                - cat
+                tty: true
+                securityContext:
+                  privileged: true
+                volumeMounts:
+                - name: docker-socket
+                  mountPath: /var/run/docker.sock
+              volumes:
+              - name: docker-socket
+                hostPath:
+                  path: /var/run/docker.sock
             """
         }
     }
