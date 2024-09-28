@@ -1,7 +1,7 @@
 pipeline {
     agent {
         kubernetes {
-            label 'jenkins-agent-cluster'  // Назва Pod Template, який вже існує в Jenkins
+            inheritFrom 'cluster-agent'  // Назва Pod Template, який вже існує в Jenkins
             defaultContainer 'jnlp'
         }
     }
@@ -15,7 +15,8 @@ pipeline {
         stage('Запуск MySQL на кластері') {
             steps {
                 script {
-                    docker.run('-e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=Qwerty-1" -p 1433:1433 --name sql111 --hostname sql1 -d mcr.microsoft.com/mssql/server:2022-latest')
+                    def mysqlImage = docker.image('mcr.microsoft.com/mssql/server:2022-latest')
+                    mysqlImage.run('-e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=Qwerty-1" -p 1433:1433 --name sql111 --hostname sql1 -d')
                     echo 'MySQL container started'
                 }
             }
@@ -25,8 +26,8 @@ pipeline {
             steps {
                 dir('FrontEnd/my-app') {
                     script {
-                        docker.build("frontend/my-app", "-t frontend:latest .")
-                        docker.image("frontend:latest").run("-d -p 81:80")
+                        def frontendImage = docker.build("frontend/my-app", "-t frontend:latest .")
+                        frontendImage.run('-d -p 81:80')
                     }
                 }
             }
@@ -36,8 +37,8 @@ pipeline {
             steps {
                 dir('BackEnd/Amazon-clone') {
                     script {
-                        docker.build("backend/my-app", "-t backend:latest .")
-                        docker.image("backend:latest").run("-d -p 5034:5034")
+                        def backendImage = docker.build("backend/my-app", "-t backend:latest .")
+                        backendImage.run('-d -p 5034:5034')
                     }
                 }
             }
