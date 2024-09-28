@@ -1,7 +1,6 @@
 pipeline {
     agent {
         kubernetes {
-            inheritFrom 'jenkins-agent-cluster'
             label 'cluster-agent'
             defaultContainer 'jnlp'
         }
