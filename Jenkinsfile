@@ -1,7 +1,8 @@
 pipeline {
     agent {
         kubernetes {
-            inheritFrom 'cluster-agent'  // Назва Pod Template, який вже існує в Jenkins
+            inheritFrom 'jenkins-agent-cluster'
+            label 'cluster-agent'
             defaultContainer 'jnlp'
         }
     }
