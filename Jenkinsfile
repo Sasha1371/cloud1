@@ -28,7 +28,6 @@ kw10izU57mb9
     }
 
     stages {
-        
         stage('Запуск MySQL на Node 1') {
             agent { label 'k8s-node-1' }
             steps {
@@ -44,8 +43,8 @@ kw10izU57mb9
             steps {
                 dir('FrontEnd/my-app') {
                     script {
-                        // Використовуйте допустимі імена для образів
-                        docker.build("frontend/my-app", "-t frontend:latest")
+                        // Додано контекст побудови
+                        docker.build("frontend/my-app", "-t frontend:latest .")
                         docker.image("frontend:latest").run("-d -p 81:80")
                     }
                 }
@@ -57,8 +56,7 @@ kw10izU57mb9
             steps {
                 dir('BackEnd/Amazon-clone') {
                     script {
-                        // Знову використовуйте допустимі імена
-                        docker.build("backend/my-app", "-t backend:latest")
+                        docker.build("backend/my-app", "-t backend:latest .")
                         docker.image("backend:latest").run("-d -p 5034:5034")
                     }
                 }
