@@ -29,15 +29,6 @@ kw10izU57mb9
 
     stages {
         
-        stage('Підключення до Kubernetes') {
-            agent { label 'k8s-node-1' }
-            steps {
-                kubeconfig(credentialsId: KUBE_CREDENTIALS_ID, serverUrl: KUBE_SERVER_URL, caCertificate: KUBE_CA_CERTIFICATE) {
-                    echo 'Kubernetes connection established'
-                }
-            }
-        }
-
         stage('Запуск MySQL на Node 1') {
             agent { label 'k8s-node-1' }
             steps {
@@ -48,31 +39,27 @@ kw10izU57mb9
             }
         }
 
-        stage('Запуск FrontEnd на Node 2') {
+        stage('Build FrontEnd') {
             agent { label 'k8s-node-2' }
             steps {
-                script {
-                    kubeconfig(credentialsId: KUBE_CREDENTIALS_ID, serverUrl: KUBE_SERVER_URL, caCertificate: KUBE_CA_CERTIFICATE) {
-                        dir('FrontEnd/my-app') {
-                            docker.build(".", "-t frontend:latest")
-                            docker.image("frontend:latest").run("-d -p 81:80")
-                            echo 'FrontEnd container started'
-                        }
+                dir('FrontEnd/my-app') {
+                    script {
+                        // Використовуйте допустимі імена для образів
+                        docker.build("frontend/my-app", "-t frontend:latest")
+                        docker.image("frontend:latest").run("-d -p 81:80")
                     }
                 }
             }
         }
 
-        stage('Запуск BackEnd на Node 3') {
+        stage('Build BackEnd') {
             agent { label 'k8s-node-3' }
             steps {
-                script {
-                    kubeconfig(credentialsId: KUBE_CREDENTIALS_ID, serverUrl: KUBE_SERVER_URL, caCertificate: KUBE_CA_CERTIFICATE) {
-                        dir('BackEnd/Amazon-clone') {
-                            docker.build(".", "-t backend:latest")
-                            docker.image("backend:latest").run("-d -p 5034:5034")
-                            echo 'BackEnd container started'
-                        }
+                dir('BackEnd/Amazon-clone') {
+                    script {
+                        // Знову використовуйте допустимі імена
+                        docker.build("backend/my-app", "-t backend:latest")
+                        docker.image("backend:latest").run("-d -p 5034:5034")
                     }
                 }
             }
